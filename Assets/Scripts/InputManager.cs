@@ -9,6 +9,12 @@ public class InputManager : MonoBehaviour
     {
         string inputName = nameField.text;
 
+        if (string.IsNullOrEmpty(inputName))
+        {
+            return;
+            //TODO : Display Some Kind of alert 
+        }
+
         loadDataChannelSO.RaiseEvent(inputName);
     }
 }
