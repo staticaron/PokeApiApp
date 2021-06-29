@@ -19,13 +19,24 @@ public class PokedexLoader : MonoBehaviour
     private const string pokeApiBaseUrl = "https://pokeapi.co/api/v2/";
 
     [SerializeField] DisplayDataChannelSO displayDataChannelSO;
+    [SerializeField] LoadDataChannelSO loadDataChannelSO;
 
-    [ContextMenu("Get Pokemon")]
-    public void GetData()
+    private void Awake()
     {
-        StartCoroutine(GetPokemonData("mudkip"));
+        loadDataChannelSO.loadDataEvent += GetData;
     }
 
+    private void OnDisable()
+    {
+        loadDataChannelSO.loadDataEvent -= GetData;
+    }
+
+    public void GetData(string pokemonName)
+    {
+        StartCoroutine(GetPokemonData(pokemonName));
+    }
+
+    //Get the pokemon data by index
     protected IEnumerator<YieldInstruction> GetPokemonData(int pokedexIndex)
     {
         string url = pokeApiBaseUrl + "pokemon/" + pokedexIndex.ToString();
@@ -86,6 +97,7 @@ public class PokedexLoader : MonoBehaviour
         displayDataChannelSO.RaiseEvent(pokemonData);
     }
 
+    //Get pokemon data by name
     protected IEnumerator<YieldInstruction> GetPokemonData(string pokemonName)
     {
         string url = pokeApiBaseUrl + "pokemon/" + pokemonName.ToString();
