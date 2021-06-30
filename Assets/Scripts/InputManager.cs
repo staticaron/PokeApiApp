@@ -7,12 +7,11 @@ public class InputManager : MonoBehaviour
 
     public void Submit(InputField nameField)
     {
-        string inputName = nameField.text;
+        string inputName = nameField.text.Trim();
 
         if (string.IsNullOrEmpty(inputName))
         {
             return;
-            //TODO : Display Some Kind of alert 
         }
 
         loadDataChannelSO.RaiseEvent(inputName);

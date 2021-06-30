@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System;
 
 public class PokeDataDisplay : MonoBehaviour
 {
@@ -13,10 +12,10 @@ public class PokeDataDisplay : MonoBehaviour
     [SerializeField] TMP_Text pokemonHeightText;
     [SerializeField] TMP_Text pokemonWeightText;
 
-    [Space]
-
     [SerializeField] List<GameObject> typesGO;
     [SerializeField] Dictionary<string, GameObject> typeDictionary = new Dictionary<string, GameObject>();
+
+    [Space]
 
     [SerializeField] DisplayDataChannelSO displayDataChannelSO;
 
@@ -33,6 +32,7 @@ public class PokeDataDisplay : MonoBehaviour
         displayDataChannelSO.displayDataEvent -= DisplayData;
     }
 
+    //Makes a dictionary out of the list for faster object fetching
     private void MakeTypeDictionary(List<GameObject> typesGO)
     {
         foreach (GameObject g in typesGO)
@@ -41,7 +41,7 @@ public class PokeDataDisplay : MonoBehaviour
         }
     }
 
-    [ContextMenu("Display Data")]
+    //Display Data according to the pokemon data passed. If empty data is passed then reset the ui
     private void DisplayData(PokemonData pokemonData)
     {
         //Reset older data by using empty PokemonData;
@@ -59,17 +59,18 @@ public class PokeDataDisplay : MonoBehaviour
         pokemonHeightText.text = data.height;
         pokemonWeightText.text = data.weight;
 
-        //If the data is empty then it doesn't run
+        //If the pokemon data doesn't has any type badge then reset the older type badges
+
         Debug.Log(data.types.Length);
+        Debug.Log(typeHolder.childCount);
+
         if (data.types.Length <= 0)
         {
-            int n = 0;
-            //Remove older data
-            for (int i = 0; i < typeHolder.childCount - 1; i++)
+            for (int i = 0; i < typeHolder.childCount; i++)
             {
-                n += 1;
+                GameObject.Destroy(typeHolder.GetChild(i).gameObject);
+                Debug.Log("Removed Object");
             }
-            Debug.Log($"there are {n} childs");
         }
         else
         {

@@ -44,7 +44,6 @@ public class PokedexLoader : MonoBehaviour
     //Get Data from the server
     public void GetData(string pokemonName)
     {
-        //TODO : Avoid search if the searched pokemon is already loaded
         StartCoroutine(GetPokemonData(pokemonName));
     }
 
