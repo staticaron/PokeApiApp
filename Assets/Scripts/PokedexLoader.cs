@@ -30,6 +30,7 @@ public class PokedexLoader : MonoBehaviour
     [SerializeField] DisplayDataChannelSO displayDataChannelSO;
     [SerializeField] LoadDataChannelSO loadDataChannelSO;
     [SerializeField] WarningWindowChannelSO warningWindowChannelSO;
+    [SerializeField] SoundChannelSO soundChannelSO;
 
     private void Awake()
     {
@@ -179,6 +180,9 @@ public class PokedexLoader : MonoBehaviour
 
         //Raise Event
         displayDataChannelSO.RaiseEvent(pokemonData);
+
+        //Play Loaded Sound Effects
+        soundChannelSO.RaiseEvent(SoundEffectType.SEARCH_COMPLETE);
     }
 
     //Logs the data fetched from the server

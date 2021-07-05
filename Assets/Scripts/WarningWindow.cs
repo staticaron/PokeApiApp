@@ -11,6 +11,7 @@ public class WarningWindow : MonoBehaviour
     private Animator animator;
 
     [SerializeField] WarningWindowChannelSO warningWindowChannelSO;
+    [SerializeField] SoundChannelSO soundChannelSO;
 
     private void Awake()
     {
@@ -40,6 +41,9 @@ public class WarningWindow : MonoBehaviour
 
         //Play the warning window animation
         animator.Play(PopupAnimationName);
+
+        //Play Error Sound
+        soundChannelSO.RaiseEvent(SoundEffectType.ERROR);
     }
 
     public void PopdownWindow()
