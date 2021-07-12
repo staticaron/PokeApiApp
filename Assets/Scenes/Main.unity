@@ -1077,7 +1077,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 353214274}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 669755799}
+        m_TargetAssemblyTypeName: PokeDataDisplay, Assembly-CSharp
+        m_MethodName: SwitchSprite
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &353214274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1815,7 +1827,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 267.00003}
+  m_AnchoredPosition: {x: 0, y: 100.27}
   m_SizeDelta: {x: 1500, y: 1500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &639247926
@@ -1898,7 +1910,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pokemonIdText: {fileID: 1905301006}
   pokemonNameText: {fileID: 1708149175}
-  pokemonFrontImage: {fileID: 639247926}
+  pokemonImage: {fileID: 639247926}
   typeHolder: {fileID: 132880739}
   pokemonHeightText: {fileID: 1250086708}
   pokemonWeightText: {fileID: 1620676243}
@@ -4805,7 +4817,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1811850933}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 669755799}
+        m_TargetAssemblyTypeName: PokeDataDisplay, Assembly-CSharp
+        m_MethodName: SwitchSprite
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1811850933
 MonoBehaviour:
   m_ObjectHideFlags: 0
