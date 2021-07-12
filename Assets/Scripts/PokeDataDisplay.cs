@@ -11,6 +11,9 @@ public class PokeDataDisplay : MonoBehaviour
     [SerializeField] RectTransform typeHolder;
     [SerializeField] TMP_Text pokemonHeightText;
     [SerializeField] TMP_Text pokemonWeightText;
+    [SerializeField] RectTransform moveHolder;
+
+    [SerializeField, Space] GameObject moveTemplate;
 
     private PokemonData fetchedData;
     private bool isFrontSpriteDisplayed = true;
@@ -70,12 +73,12 @@ public class PokeDataDisplay : MonoBehaviour
         pokemonWeightText.text = fetchedData.weight;
 
         //If the pokemon data doesn't has any type badge then reset the older type badges
-        if (data.types.Length <= 0)
+        if (fetchedData.types.Length <= 0)
         {
             for (int i = 0; i < typeHolder.childCount; i++)
             {
                 GameObject.Destroy(typeHolder.GetChild(i).gameObject);
-                Debug.Log("Removed Object");
+                Debug.Log("Removed the previous type badge");
             }
         }
         else
@@ -88,12 +91,33 @@ public class PokeDataDisplay : MonoBehaviour
                 typeIns.transform.SetParent(typeHolder, false);
             }
         }
+
+        //If the pokemon data doesn't has any move badges then reset the older move badges
+        if (fetchedData.moves.Count <= 0)
+        {
+            for (int i = 0; i < moveHolder.childCount; i++)
+            {
+                GameObject.Destroy(moveHolder.GetChild(i).gameObject);
+                Debug.Log("Removed previous move panels");
+            }
+        }
+        else
+        {
+            foreach (PokemonMove m in fetchedData.moves)
+            {
+                GameObject moveIns = Instantiate(moveTemplate, Vector3.zero, Quaternion.identity);
+                RectTransform rectT = moveIns.GetComponent<RectTransform>();
+                rectT.SetParent(moveHolder);
+                rectT.localScale = Vector3.one;
+                moveIns.GetComponent<Move>().UpdateUI(m);
+            }
+        }
     }
 
     [ContextMenu("Switch Sprite")]
     public void SwitchSprite()
     {
-        if(isFrontSpriteDisplayed == true)
+        if (isFrontSpriteDisplayed == true)
         {
             pokemonImage.texture = fetchedData.backSprite;
             isFrontSpriteDisplayed = false;

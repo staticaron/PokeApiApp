@@ -14,7 +14,7 @@ public class PokemonData
     public string weight { get; set; }
     public List<PokemonMove> moves;
 
-    public PokemonData(string id = "0", string name = "", string[] types = null, Texture2D f_sprite = null, Texture2D b_sprite = null, string height = "", string weight = "",List<PokemonMove> moves = null)
+    public PokemonData(string id = "0", string name = "", string[] types = null, Texture2D f_sprite = null, Texture2D b_sprite = null, string height = "", string weight = "", List<PokemonMove> moves = null)
     {
         this.id = id;
         this.name = name;
@@ -27,12 +27,14 @@ public class PokemonData
     }
 }
 
-public class PokemonMove{
+public class PokemonMove
+{
     public string moveName;
     public int levelLearnedAt;
     public string learnMethod;
 
-    public PokemonMove(string name = "", int level = 0, string method = ""){
+    public PokemonMove(string name = "", int level = 0, string method = "")
+    {
         this.moveName = name;
         this.levelLearnedAt = level;
         this.learnMethod = method;
@@ -206,10 +208,13 @@ public class PokedexLoader : MonoBehaviour
         //------Moves
         JSONNode moves = jsonData["moves"];
 
-        for(int i = 0; i < moves.Count; i++){
+        for (int i = 0; i < moves.Count; i++)
+        {
 
             string moveName = moves[i]["move"]["name"];
             int levelLearnedAt = moves[i]["version_group_details"][0]["level_learned_at"];
+
+            //TODO Fix method to show the corrent method instead of other.
             string method = levelLearnedAt == 0 ? "other" : "level-up";
 
             PokemonMove move = new PokemonMove(moveName, levelLearnedAt, method);
@@ -229,15 +234,12 @@ public class PokedexLoader : MonoBehaviour
     //Logs the data fetched from the server
     protected void PrintData(PokemonData pokemonData)
     {
-        Debug.Log(pokemonData.id);
-        Debug.Log(pokemonData.name);
+        Debug.Log($"Pokemon ID is {pokemonData.id}");
+        Debug.Log($"Pokemon name is {pokemonData.name}");
+
         for (int i = 0; i < pokemonData.types.Length; i++)
         {
-            Debug.Log(pokemonData.types[i]);
-        }
-
-        for(int i = 0; i < pokemonData.moves.Count; i++){
-            Debug.Log(pokemonData.moves[i].moveName);
+            Debug.Log($"Type is {pokemonData.types[i]}");
         }
     }
 }
