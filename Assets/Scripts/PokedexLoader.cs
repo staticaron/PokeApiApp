@@ -215,7 +215,7 @@ public class PokedexLoader : MonoBehaviour
             int levelLearnedAt = moves[i]["version_group_details"][0]["level_learned_at"];
 
             //TODO Fix method to show the corrent method instead of other.
-            string method = levelLearnedAt == 0 ? "other" : "level-up";
+            string method = moves[i]["version_group_details"][0]["move_learn_method"]["name"];
 
             PokemonMove move = new PokemonMove(moveName, levelLearnedAt, method);
 

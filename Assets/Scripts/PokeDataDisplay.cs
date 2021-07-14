@@ -5,6 +5,8 @@ using TMPro;
 
 public class PokeDataDisplay : MonoBehaviour
 {
+    [SerializeField] const string LabelTag = "Label";
+
     [SerializeField] TMP_Text pokemonIdText;
     [SerializeField] TMP_Text pokemonNameText;
     [SerializeField] RawImage pokemonImage;
@@ -77,7 +79,12 @@ public class PokeDataDisplay : MonoBehaviour
         {
             for (int i = 0; i < typeHolder.childCount; i++)
             {
-                GameObject.Destroy(typeHolder.GetChild(i).gameObject);
+                GameObject child = typeHolder.GetChild(i).gameObject;
+
+                //Ignore the labels
+                if(child.tag == LabelTag) continue;
+
+                GameObject.Destroy(child);
                 Debug.Log("Removed the previous type badge");
             }
         }
@@ -97,7 +104,12 @@ public class PokeDataDisplay : MonoBehaviour
         {
             for (int i = 0; i < moveHolder.childCount; i++)
             {
-                GameObject.Destroy(moveHolder.GetChild(i).gameObject);
+                GameObject child = moveHolder.GetChild(i).gameObject;
+
+                //Ignore the labels
+                if(child.tag == LabelTag) continue;
+
+                GameObject.Destroy(child);
                 Debug.Log("Removed previous move panels");
             }
         }
