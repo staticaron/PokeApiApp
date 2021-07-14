@@ -7,6 +7,7 @@ public class PokeDataDisplay : MonoBehaviour
 {
     [SerializeField] const string LabelTag = "Label";
 
+    [Header("Fields")]
     [SerializeField] TMP_Text pokemonIdText;
     [SerializeField] TMP_Text pokemonNameText;
     [SerializeField] RawImage pokemonImage;
@@ -14,6 +15,7 @@ public class PokeDataDisplay : MonoBehaviour
     [SerializeField] TMP_Text pokemonHeightText;
     [SerializeField] TMP_Text pokemonWeightText;
     [SerializeField] RectTransform moveHolder;
+    [SerializeField] GameObject imageSwitchButtonHolder;
 
     [SerializeField, Space] GameObject moveTemplate;
 
@@ -23,10 +25,7 @@ public class PokeDataDisplay : MonoBehaviour
     [SerializeField] List<GameObject> typesGO;
     [SerializeField] Dictionary<string, GameObject> typeDictionary = new Dictionary<string, GameObject>();
 
-    [Space]
-
-    [SerializeField] DisplayDataChannelSO displayDataChannelSO;
-
+    [SerializeField, Space] DisplayDataChannelSO displayDataChannelSO;
     private void Awake()
     {
         displayDataChannelSO.displayDataEvent += DisplayData;
@@ -73,6 +72,17 @@ public class PokeDataDisplay : MonoBehaviour
         pokemonImage.texture = fetchedData.frontSprite;
         pokemonHeightText.text = fetchedData.height;
         pokemonWeightText.text = fetchedData.weight;
+
+        //Images
+        if(fetchedData.backSprite == null)
+        {
+            imageSwitchButtonHolder.SetActive(false);
+            fetchedData.backSprite = fetchedData.frontSprite;
+        }
+        else
+        {
+            imageSwitchButtonHolder.SetActive(true);
+        }
 
         //If the pokemon data doesn't has any type badge then reset the older type badges
         if (fetchedData.types.Length <= 0)

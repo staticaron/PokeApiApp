@@ -2,7 +2,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections.Generic;
 using SimpleJSON;
+using System;
 
+[Serializable]
 public class PokemonData
 {
     public string id { get; set; }
@@ -80,6 +82,7 @@ public class PokedexLoader : MonoBehaviour
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError || request.result == UnityWebRequest.Result.DataProcessingError)
         {
             Debug.LogWarning("Failed to get the Pokemon Data from the server \n Data failed to load");
+            Debug.LogWarning($"URL tried was {url}");
             yield break;
         }
 
@@ -135,7 +138,6 @@ public class PokedexLoader : MonoBehaviour
         //Create A request to PokeApi based on the index
         UnityWebRequest request = UnityWebRequest.Get(url);
 
-        //Check for any errors
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.ConnectionError)
@@ -154,7 +156,6 @@ public class PokedexLoader : MonoBehaviour
         //Get result from the request
         JSONNode jsonData = JSON.Parse(request.downloadHandler.text);
 
-        //Store the data into the the PokemonData class
         PokemonData pokemonData = new PokemonData();
 
         //-------General
@@ -165,30 +166,39 @@ public class PokedexLoader : MonoBehaviour
         string frontSpriteUrl = jsonData["sprites"]["front_default"];
         string backSpriteUrl = jsonData["sprites"]["back_default"];
 
-        UnityWebRequest frontSpriteRequest = UnityWebRequestTexture.GetTexture(frontSpriteUrl);
-        UnityWebRequest backSpriteRequest = UnityWebRequestTexture.GetTexture(backSpriteUrl);
-
-        yield return frontSpriteRequest.SendWebRequest();
-        yield return backSpriteRequest.SendWebRequest();
-
-        if (frontSpriteRequest.result == UnityWebRequest.Result.ConnectionError || frontSpriteRequest.result == UnityWebRequest.Result.ProtocolError || frontSpriteRequest.result == UnityWebRequest.Result.DataProcessingError)
+        if(frontSpriteUrl != null)
         {
-            Debug.LogWarning("Failed to get the Pokemon Data from the server \n Front Image failed to load");
-            warningWindowChannelSO.RaiseEvent(WarningType.CONNECTION);
-            yield break;
+            UnityWebRequest frontSpriteRequest = UnityWebRequestTexture.GetTexture(frontSpriteUrl);
+
+            yield return frontSpriteRequest.SendWebRequest();
+
+            if (frontSpriteRequest.result == UnityWebRequest.Result.ConnectionError || frontSpriteRequest.result == UnityWebRequest.Result.ProtocolError || frontSpriteRequest.result == UnityWebRequest.Result.DataProcessingError)
+            {
+                Debug.LogWarning("Failed to get the Pokemon Data from the server \n Front Image failed to load");
+                warningWindowChannelSO.RaiseEvent(WarningType.CONNECTION);
+                yield break;
+            }    
+
+            pokemonData.frontSprite = DownloadHandlerTexture.GetContent(frontSpriteRequest);
+            pokemonData.frontSprite.filterMode = FilterMode.Point;
         }
-        if (backSpriteRequest.result == UnityWebRequest.Result.ConnectionError || backSpriteRequest.result == UnityWebRequest.Result.ProtocolError || backSpriteRequest.result == UnityWebRequest.Result.DataProcessingError)
+        
+        if(backSpriteUrl != null)
         {
-            Debug.LogWarning("Failed to get the Pokemon Data from the server \n Back Image failed to load");
-            warningWindowChannelSO.RaiseEvent(WarningType.CONNECTION);
-            yield break;
+            UnityWebRequest backSpriteRequest = UnityWebRequestTexture.GetTexture(backSpriteUrl);
+
+            yield return backSpriteRequest.SendWebRequest();
+            
+            if (backSpriteRequest.result == UnityWebRequest.Result.ConnectionError || backSpriteRequest.result == UnityWebRequest.Result.ProtocolError || backSpriteRequest.result == UnityWebRequest.Result.DataProcessingError)
+            {
+                Debug.LogWarning("Failed to get the Pokemon Data from the server \n Back Image failed to load");
+                warningWindowChannelSO.RaiseEvent(WarningType.CONNECTION);
+                yield break;
+            }
+
+            pokemonData.backSprite = DownloadHandlerTexture.GetContent(backSpriteRequest);
+            pokemonData.backSprite.filterMode = FilterMode.Point;
         }
-
-        pokemonData.frontSprite = DownloadHandlerTexture.GetContent(frontSpriteRequest);
-        pokemonData.backSprite = DownloadHandlerTexture.GetContent(backSpriteRequest);
-
-        pokemonData.frontSprite.filterMode = FilterMode.Point;
-        pokemonData.backSprite.filterMode = FilterMode.Point;
 
         //-------Type
         JSONNode types = jsonData["types"];
