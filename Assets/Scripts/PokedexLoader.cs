@@ -2,7 +2,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections.Generic;
 using SimpleJSON;
+using System;
 
+[Serializable]
 public class PokemonData
 {
     public string id { get; set; }
@@ -12,8 +14,9 @@ public class PokemonData
     public Texture2D backSprite { get; set; }
     public string height { get; set; }
     public string weight { get; set; }
+    public List<PokemonMove> moves;
 
-    public PokemonData(string id = "0", string name = "", string[] types = null, Texture2D f_sprite = null, Texture2D b_sprite = null, string height = "", string weight = "")
+    public PokemonData(string id = "0", string name = "", string[] types = null, Texture2D f_sprite = null, Texture2D b_sprite = null, string height = "", string weight = "", List<PokemonMove> moves = null)
     {
         this.id = id;
         this.name = name;
@@ -22,6 +25,21 @@ public class PokemonData
         this.backSprite = b_sprite;
         this.height = height;
         this.weight = weight;
+        this.moves = moves == null ? new List<PokemonMove>() : moves;
+    }
+}
+
+public class PokemonMove
+{
+    public string moveName;
+    public int levelLearnedAt;
+    public string learnMethod;
+
+    public PokemonMove(string name = "", int level = 0, string method = "")
+    {
+        this.moveName = name;
+        this.levelLearnedAt = level;
+        this.learnMethod = method;
     }
 }
 
@@ -64,6 +82,7 @@ public class PokedexLoader : MonoBehaviour
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError || request.result == UnityWebRequest.Result.DataProcessingError)
         {
             Debug.LogWarning("Failed to get the Pokemon Data from the server \n Data failed to load");
+            Debug.LogWarning($"URL tried was {url}");
             yield break;
         }
 
@@ -119,7 +138,6 @@ public class PokedexLoader : MonoBehaviour
         //Create A request to PokeApi based on the index
         UnityWebRequest request = UnityWebRequest.Get(url);
 
-        //Check for any errors
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.ConnectionError)
@@ -138,7 +156,6 @@ public class PokedexLoader : MonoBehaviour
         //Get result from the request
         JSONNode jsonData = JSON.Parse(request.downloadHandler.text);
 
-        //Store the data into the the PokemonData class
         PokemonData pokemonData = new PokemonData();
 
         //-------General
@@ -149,30 +166,39 @@ public class PokedexLoader : MonoBehaviour
         string frontSpriteUrl = jsonData["sprites"]["front_default"];
         string backSpriteUrl = jsonData["sprites"]["back_default"];
 
-        UnityWebRequest frontSpriteRequest = UnityWebRequestTexture.GetTexture(frontSpriteUrl);
-        UnityWebRequest backSpriteRequest = UnityWebRequestTexture.GetTexture(backSpriteUrl);
-
-        yield return frontSpriteRequest.SendWebRequest();
-        yield return backSpriteRequest.SendWebRequest();
-
-        if (frontSpriteRequest.result == UnityWebRequest.Result.ConnectionError || frontSpriteRequest.result == UnityWebRequest.Result.ProtocolError || frontSpriteRequest.result == UnityWebRequest.Result.DataProcessingError)
+        if(frontSpriteUrl != null)
         {
-            Debug.LogWarning("Failed to get the Pokemon Data from the server \n Front Image failed to load");
-            warningWindowChannelSO.RaiseEvent(WarningType.CONNECTION);
-            yield break;
+            UnityWebRequest frontSpriteRequest = UnityWebRequestTexture.GetTexture(frontSpriteUrl);
+
+            yield return frontSpriteRequest.SendWebRequest();
+
+            if (frontSpriteRequest.result == UnityWebRequest.Result.ConnectionError || frontSpriteRequest.result == UnityWebRequest.Result.ProtocolError || frontSpriteRequest.result == UnityWebRequest.Result.DataProcessingError)
+            {
+                Debug.LogWarning("Failed to get the Pokemon Data from the server \n Front Image failed to load");
+                warningWindowChannelSO.RaiseEvent(WarningType.CONNECTION);
+                yield break;
+            }    
+
+            pokemonData.frontSprite = DownloadHandlerTexture.GetContent(frontSpriteRequest);
+            pokemonData.frontSprite.filterMode = FilterMode.Point;
         }
-        if (backSpriteRequest.result == UnityWebRequest.Result.ConnectionError || backSpriteRequest.result == UnityWebRequest.Result.ProtocolError || backSpriteRequest.result == UnityWebRequest.Result.DataProcessingError)
+        
+        if(backSpriteUrl != null)
         {
-            Debug.LogWarning("Failed to get the Pokemon Data from the server \n Back Image failed to load");
-            warningWindowChannelSO.RaiseEvent(WarningType.CONNECTION);
-            yield break;
+            UnityWebRequest backSpriteRequest = UnityWebRequestTexture.GetTexture(backSpriteUrl);
+
+            yield return backSpriteRequest.SendWebRequest();
+            
+            if (backSpriteRequest.result == UnityWebRequest.Result.ConnectionError || backSpriteRequest.result == UnityWebRequest.Result.ProtocolError || backSpriteRequest.result == UnityWebRequest.Result.DataProcessingError)
+            {
+                Debug.LogWarning("Failed to get the Pokemon Data from the server \n Back Image failed to load");
+                warningWindowChannelSO.RaiseEvent(WarningType.CONNECTION);
+                yield break;
+            }
+
+            pokemonData.backSprite = DownloadHandlerTexture.GetContent(backSpriteRequest);
+            pokemonData.backSprite.filterMode = FilterMode.Point;
         }
-
-        pokemonData.frontSprite = DownloadHandlerTexture.GetContent(frontSpriteRequest);
-        pokemonData.backSprite = DownloadHandlerTexture.GetContent(backSpriteRequest);
-
-        pokemonData.frontSprite.filterMode = FilterMode.Point;
-        pokemonData.backSprite.filterMode = FilterMode.Point;
 
         //-------Type
         JSONNode types = jsonData["types"];
@@ -185,9 +211,26 @@ public class PokedexLoader : MonoBehaviour
 
         pokemonData.types = pokeTypesName;
 
-        //Height and Weight
+        //------Height and Weight
         pokemonData.height = jsonData["height"];
         pokemonData.weight = jsonData["weight"];
+
+        //------Moves
+        JSONNode moves = jsonData["moves"];
+
+        for (int i = 0; i < moves.Count; i++)
+        {
+
+            string moveName = moves[i]["move"]["name"];
+            int levelLearnedAt = moves[i]["version_group_details"][0]["level_learned_at"];
+
+            //TODO Fix method to show the corrent method instead of other.
+            string method = moves[i]["version_group_details"][0]["move_learn_method"]["name"];
+
+            PokemonMove move = new PokemonMove(moveName, levelLearnedAt, method);
+
+            pokemonData.moves.Add(move);
+        }
 
         PrintData(pokemonData);
 
@@ -201,11 +244,12 @@ public class PokedexLoader : MonoBehaviour
     //Logs the data fetched from the server
     protected void PrintData(PokemonData pokemonData)
     {
-        Debug.Log(pokemonData.id);
-        Debug.Log(pokemonData.name);
+        Debug.Log($"Pokemon ID is {pokemonData.id}");
+        Debug.Log($"Pokemon name is {pokemonData.name}");
+
         for (int i = 0; i < pokemonData.types.Length; i++)
         {
-            Debug.Log(pokemonData.types[i]);
+            Debug.Log($"Type is {pokemonData.types[i]}");
         }
     }
 }

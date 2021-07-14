@@ -5,12 +5,19 @@ using TMPro;
 
 public class PokeDataDisplay : MonoBehaviour
 {
+    [SerializeField] const string LabelTag = "Label";
+
+    [Header("Fields")]
     [SerializeField] TMP_Text pokemonIdText;
     [SerializeField] TMP_Text pokemonNameText;
     [SerializeField] RawImage pokemonImage;
     [SerializeField] RectTransform typeHolder;
     [SerializeField] TMP_Text pokemonHeightText;
     [SerializeField] TMP_Text pokemonWeightText;
+    [SerializeField] RectTransform moveHolder;
+    [SerializeField] GameObject imageSwitchButtonHolder;
+
+    [SerializeField, Space] GameObject moveTemplate;
 
     private PokemonData fetchedData;
     private bool isFrontSpriteDisplayed = true;
@@ -18,10 +25,7 @@ public class PokeDataDisplay : MonoBehaviour
     [SerializeField] List<GameObject> typesGO;
     [SerializeField] Dictionary<string, GameObject> typeDictionary = new Dictionary<string, GameObject>();
 
-    [Space]
-
-    [SerializeField] DisplayDataChannelSO displayDataChannelSO;
-
+    [SerializeField, Space] DisplayDataChannelSO displayDataChannelSO;
     private void Awake()
     {
         displayDataChannelSO.displayDataEvent += DisplayData;
@@ -69,13 +73,29 @@ public class PokeDataDisplay : MonoBehaviour
         pokemonHeightText.text = fetchedData.height;
         pokemonWeightText.text = fetchedData.weight;
 
+        //Images
+        if(fetchedData.backSprite == null)
+        {
+            imageSwitchButtonHolder.SetActive(false);
+            fetchedData.backSprite = fetchedData.frontSprite;
+        }
+        else
+        {
+            imageSwitchButtonHolder.SetActive(true);
+        }
+
         //If the pokemon data doesn't has any type badge then reset the older type badges
-        if (data.types.Length <= 0)
+        if (fetchedData.types.Length <= 0)
         {
             for (int i = 0; i < typeHolder.childCount; i++)
             {
-                GameObject.Destroy(typeHolder.GetChild(i).gameObject);
-                Debug.Log("Removed Object");
+                GameObject child = typeHolder.GetChild(i).gameObject;
+
+                //Ignore the labels
+                if(child.tag == LabelTag) continue;
+
+                GameObject.Destroy(child);
+                Debug.Log("Removed the previous type badge");
             }
         }
         else
@@ -88,12 +108,38 @@ public class PokeDataDisplay : MonoBehaviour
                 typeIns.transform.SetParent(typeHolder, false);
             }
         }
+
+        //If the pokemon data doesn't has any move badges then reset the older move badges
+        if (fetchedData.moves.Count <= 0)
+        {
+            for (int i = 0; i < moveHolder.childCount; i++)
+            {
+                GameObject child = moveHolder.GetChild(i).gameObject;
+
+                //Ignore the labels
+                if(child.tag == LabelTag) continue;
+
+                GameObject.Destroy(child);
+                Debug.Log("Removed previous move panels");
+            }
+        }
+        else
+        {
+            foreach (PokemonMove m in fetchedData.moves)
+            {
+                GameObject moveIns = Instantiate(moveTemplate, Vector3.zero, Quaternion.identity);
+                RectTransform rectT = moveIns.GetComponent<RectTransform>();
+                rectT.SetParent(moveHolder);
+                rectT.localScale = Vector3.one;
+                moveIns.GetComponent<Move>().UpdateUI(m);
+            }
+        }
     }
 
     [ContextMenu("Switch Sprite")]
     public void SwitchSprite()
     {
-        if(isFrontSpriteDisplayed == true)
+        if (isFrontSpriteDisplayed == true)
         {
             pokemonImage.texture = fetchedData.backSprite;
             isFrontSpriteDisplayed = false;
