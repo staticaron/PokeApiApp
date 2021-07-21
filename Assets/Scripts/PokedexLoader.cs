@@ -196,7 +196,7 @@ public class PokedexLoader : MonoBehaviour
             pokemonData.moves.Add(move);
         }
 
-        //------Info
+        //------PokemonInfo
         string pokemonSpeciesUrl = pokeApiBaseUrl + "pokemon-species/" + pokemonData.id.ToString();
         UnityWebRequest speciesRequest = UnityWebRequest.Get(pokemonSpeciesUrl);
 
@@ -217,8 +217,15 @@ public class PokedexLoader : MonoBehaviour
 
         JSONNode jsonSpeciesData = JSON.Parse(speciesRequest.downloadHandler.text);
 
-        string info = jsonSpeciesData["flavor_text_entries"][enLangIndex]["flavor_text"];
-        pokemonData.pokedexInfo = info;
+        JSONNode info = jsonSpeciesData["flavor_text_entries"];
+        for (int i = 0; i < info.Count; i++)
+        {
+            string lang = info[i]["language"]["name"];
+            if (lang == "en")
+            {
+                pokemonData.pokedexInfo = info[i]["flavor_text"];
+            }
+        }
 
         PrintData(pokemonData);
 
@@ -234,12 +241,5 @@ public class PokedexLoader : MonoBehaviour
     {
         Debug.Log($"Pokemon ID is {pokemonData.id}");
         Debug.Log($"Pokemon name is {pokemonData.name}");
-
-        for (int i = 0; i < pokemonData.types.Length; i++)
-        {
-            Debug.Log($"Type is {pokemonData.types[i]}");
-        }
-
-        Debug.Log($"Pokedex Info {pokemonData.pokedexInfo}");
     }
 }

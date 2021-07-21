@@ -507,7 +507,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1480, y: -4944}
+  m_AnchoredPosition: {x: 1480, y: -4422.9995}
   m_SizeDelta: {x: 2514.8, y: 451.085}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &132880740
@@ -1839,8 +1839,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 665.8291}
-  m_SizeDelta: {x: -445.2, y: -6700.564}
+  m_AnchoredPosition: {x: 0, y: 923.2849}
+  m_SizeDelta: {x: -445.2, y: -7215.476}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &590216370
 MonoBehaviour:
@@ -2998,7 +2998,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1480, y: -6624}
+  m_AnchoredPosition: {x: 1480, y: -6102.9995}
   m_SizeDelta: {x: 2514.8, y: 1899.72}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &837547822
@@ -4136,9 +4136,9 @@ RectTransform:
   m_Father: {fileID: 765612952}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 1183.6155, y: -143.43451}
   m_SizeDelta: {x: 2241.4, y: 186.869}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1373979071
@@ -5352,7 +5352,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1480, y: -5594}
+  m_AnchoredPosition: {x: 1480, y: -5073}
   m_SizeDelta: {x: 2514.766, y: 585.761}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1766121081
@@ -6127,7 +6127,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Moves
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 312bbc4ecc7cd30429d6140490d2b03f, type: 2}
   m_sharedMaterial: {fileID: -7780606123861863492, guid: 312bbc4ecc7cd30429d6140490d2b03f, type: 2}
@@ -6154,12 +6154,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 150
+  m_fontSize: 100
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
-  m_fontSizeMax: 150
+  m_fontSizeMin: 100
+  m_fontSizeMax: 160
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
