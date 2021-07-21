@@ -188,12 +188,12 @@ public class PokedexLoader : MonoBehaviour
             string moveName = moves[i]["move"]["name"];
             int levelLearnedAt = moves[i]["version_group_details"][0]["level_learned_at"];
 
-            //TODO Fix method to show the corrent method instead of other.
             string method = moves[i]["version_group_details"][0]["move_learn_method"]["name"];
 
             PokemonMove move = new PokemonMove(moveName, levelLearnedAt, method);
 
             pokemonData.moves.Add(move);
+
         }
 
         //------PokemonInfo
