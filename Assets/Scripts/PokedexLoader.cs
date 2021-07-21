@@ -2,50 +2,12 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections.Generic;
 using SimpleJSON;
-using System;
-
-[Serializable]
-public class PokemonData
-{
-    public string id { get; set; }
-    public string name { get; set; }
-    public string[] types { get; set; }
-    public Texture2D frontSprite { get; set; }
-    public Texture2D backSprite { get; set; }
-    public string height { get; set; }
-    public string weight { get; set; }
-    public List<PokemonMove> moves;
-
-    public PokemonData(string id = "0", string name = "", string[] types = null, Texture2D f_sprite = null, Texture2D b_sprite = null, string height = "", string weight = "", List<PokemonMove> moves = null)
-    {
-        this.id = id;
-        this.name = name;
-        this.types = types == null ? new string[0] : types;
-        this.frontSprite = f_sprite;
-        this.backSprite = b_sprite;
-        this.height = height;
-        this.weight = weight;
-        this.moves = moves == null ? new List<PokemonMove>() : moves;
-    }
-}
-
-public class PokemonMove
-{
-    public string moveName;
-    public int levelLearnedAt;
-    public string learnMethod;
-
-    public PokemonMove(string name = "", int level = 0, string method = "")
-    {
-        this.moveName = name;
-        this.levelLearnedAt = level;
-        this.learnMethod = method;
-    }
-}
 
 public class PokedexLoader : MonoBehaviour
 {
     private const string pokeApiBaseUrl = "https://pokeapi.co/api/v2/";
+
+    private const int enLangIndex = 0;
 
     [SerializeField] DisplayDataChannelSO displayDataChannelSO;
     [SerializeField] LoadDataChannelSO loadDataChannelSO;
@@ -71,23 +33,25 @@ public class PokedexLoader : MonoBehaviour
     //Get the pokemon data by index
     protected IEnumerator<YieldInstruction> GetPokemonData(int pokedexIndex)
     {
-        string url = pokeApiBaseUrl + "pokemon/" + pokedexIndex.ToString();
+        string pokemonUrl = pokeApiBaseUrl + "pokemon/" + pokedexIndex.ToString();
+        string pokemonSpeciesUrl = pokeApiBaseUrl + "pokemon-species/" + pokedexIndex.ToString();
 
         //Create A request to PokeApi based on the index
-        UnityWebRequest request = UnityWebRequest.Get(url);
+        UnityWebRequest pokemonRequest = UnityWebRequest.Get(pokemonUrl);
+        UnityWebRequest speciesRequest = UnityWebRequest.Get(pokemonSpeciesUrl);
 
         //Check for any errors
-        yield return request.SendWebRequest();
+        yield return pokemonRequest.SendWebRequest();
 
-        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError || request.result == UnityWebRequest.Result.DataProcessingError)
+        if (pokemonRequest.result == UnityWebRequest.Result.ConnectionError || pokemonRequest.result == UnityWebRequest.Result.ProtocolError || pokemonRequest.result == UnityWebRequest.Result.DataProcessingError)
         {
             Debug.LogWarning("Failed to get the Pokemon Data from the server \n Data failed to load");
-            Debug.LogWarning($"URL tried was {url}");
+            Debug.LogWarning($"URL tried was {pokemonUrl}");
             yield break;
         }
 
         //Get result from the request
-        JSONNode jsonData = JSON.Parse(request.downloadHandler.text);
+        JSONNode jsonData = JSON.Parse(pokemonRequest.downloadHandler.text);
 
         //Store the data into the the PokemonData class
         PokemonData pokemonData = new PokemonData();
@@ -103,7 +67,7 @@ public class PokedexLoader : MonoBehaviour
 
         yield return spriteRequest.SendWebRequest();
 
-        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError || request.result == UnityWebRequest.Result.DataProcessingError)
+        if (pokemonRequest.result == UnityWebRequest.Result.ConnectionError || pokemonRequest.result == UnityWebRequest.Result.ProtocolError || pokemonRequest.result == UnityWebRequest.Result.DataProcessingError)
         {
             Debug.LogWarning("Failed to get the Pokemon Data from the server \n Image failed to load");
             yield break;
@@ -154,19 +118,19 @@ public class PokedexLoader : MonoBehaviour
         }
 
         //Get result from the request
-        JSONNode jsonData = JSON.Parse(request.downloadHandler.text);
+        JSONNode jsonPokemonData = JSON.Parse(request.downloadHandler.text);
 
         PokemonData pokemonData = new PokemonData();
 
         //-------General
-        pokemonData.id = jsonData["id"];
-        pokemonData.name = jsonData["name"];
+        pokemonData.id = jsonPokemonData["id"];
+        pokemonData.name = jsonPokemonData["name"];
 
         //-------Sprite
-        string frontSpriteUrl = jsonData["sprites"]["front_default"];
-        string backSpriteUrl = jsonData["sprites"]["back_default"];
+        string frontSpriteUrl = jsonPokemonData["sprites"]["front_default"];
+        string backSpriteUrl = jsonPokemonData["sprites"]["back_default"];
 
-        if(frontSpriteUrl != null)
+        if (frontSpriteUrl != null)
         {
             UnityWebRequest frontSpriteRequest = UnityWebRequestTexture.GetTexture(frontSpriteUrl);
 
@@ -177,18 +141,18 @@ public class PokedexLoader : MonoBehaviour
                 Debug.LogWarning("Failed to get the Pokemon Data from the server \n Front Image failed to load");
                 warningWindowChannelSO.RaiseEvent(WarningType.CONNECTION);
                 yield break;
-            }    
+            }
 
             pokemonData.frontSprite = DownloadHandlerTexture.GetContent(frontSpriteRequest);
             pokemonData.frontSprite.filterMode = FilterMode.Point;
         }
-        
-        if(backSpriteUrl != null)
+
+        if (backSpriteUrl != null)
         {
             UnityWebRequest backSpriteRequest = UnityWebRequestTexture.GetTexture(backSpriteUrl);
 
             yield return backSpriteRequest.SendWebRequest();
-            
+
             if (backSpriteRequest.result == UnityWebRequest.Result.ConnectionError || backSpriteRequest.result == UnityWebRequest.Result.ProtocolError || backSpriteRequest.result == UnityWebRequest.Result.DataProcessingError)
             {
                 Debug.LogWarning("Failed to get the Pokemon Data from the server \n Back Image failed to load");
@@ -201,7 +165,7 @@ public class PokedexLoader : MonoBehaviour
         }
 
         //-------Type
-        JSONNode types = jsonData["types"];
+        JSONNode types = jsonPokemonData["types"];
         string[] pokeTypesName = new string[types.Count];
 
         for (int i = pokeTypesName.Length - 1; i >= 0; i--)
@@ -212,11 +176,11 @@ public class PokedexLoader : MonoBehaviour
         pokemonData.types = pokeTypesName;
 
         //------Height and Weight
-        pokemonData.height = jsonData["height"];
-        pokemonData.weight = jsonData["weight"];
+        pokemonData.height = jsonPokemonData["height"];
+        pokemonData.weight = jsonPokemonData["weight"];
 
         //------Moves
-        JSONNode moves = jsonData["moves"];
+        JSONNode moves = jsonPokemonData["moves"];
 
         for (int i = 0; i < moves.Count; i++)
         {
@@ -231,6 +195,30 @@ public class PokedexLoader : MonoBehaviour
 
             pokemonData.moves.Add(move);
         }
+
+        //------Info
+        string pokemonSpeciesUrl = pokeApiBaseUrl + "pokemon-species/" + pokemonData.id.ToString();
+        UnityWebRequest speciesRequest = UnityWebRequest.Get(pokemonSpeciesUrl);
+
+        yield return speciesRequest.SendWebRequest();
+
+        if (speciesRequest.result == UnityWebRequest.Result.ConnectionError)
+        {
+            Debug.LogWarning("Failed to get the Pokemon Data from the server \n Connection Error");
+            warningWindowChannelSO.RaiseEvent(WarningType.CONNECTION);
+            yield break;
+        }
+        else if (speciesRequest.result == UnityWebRequest.Result.ProtocolError || speciesRequest.result == UnityWebRequest.Result.DataProcessingError)
+        {
+            Debug.LogWarning("Failed to get the Pokemon Data from the server \n Pokemon not found");
+            warningWindowChannelSO.RaiseEvent(WarningType.NOTFOUND);
+            yield break;
+        }
+
+        JSONNode jsonSpeciesData = JSON.Parse(speciesRequest.downloadHandler.text);
+
+        string info = jsonSpeciesData["flavor_text_entries"][enLangIndex]["flavor_text"];
+        pokemonData.pokedexInfo = info;
 
         PrintData(pokemonData);
 
@@ -251,5 +239,7 @@ public class PokedexLoader : MonoBehaviour
         {
             Debug.Log($"Type is {pokemonData.types[i]}");
         }
+
+        Debug.Log($"Pokedex Info {pokemonData.pokedexInfo}");
     }
 }
