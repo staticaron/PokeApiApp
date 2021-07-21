@@ -16,6 +16,7 @@ public class PokeDataDisplay : MonoBehaviour
     [SerializeField] TMP_Text pokemonWeightText;
     [SerializeField] RectTransform moveHolder;
     [SerializeField] GameObject imageSwitchButtonHolder;
+    [SerializeField] TMP_Text pokedexInfo;
 
     [SerializeField, Space] GameObject moveTemplate;
 
@@ -72,9 +73,10 @@ public class PokeDataDisplay : MonoBehaviour
         pokemonImage.texture = fetchedData.frontSprite;
         pokemonHeightText.text = fetchedData.height;
         pokemonWeightText.text = fetchedData.weight;
+        pokedexInfo.text = fetchedData.pokedexInfo;
 
         //Images
-        if(fetchedData.backSprite == null)
+        if (fetchedData.backSprite == null)
         {
             imageSwitchButtonHolder.SetActive(false);
             fetchedData.backSprite = fetchedData.frontSprite;
@@ -92,7 +94,7 @@ public class PokeDataDisplay : MonoBehaviour
                 GameObject child = typeHolder.GetChild(i).gameObject;
 
                 //Ignore the labels
-                if(child.tag == LabelTag) continue;
+                if (child.tag == LabelTag) continue;
 
                 GameObject.Destroy(child);
                 Debug.Log("Removed the previous type badge");
@@ -117,7 +119,7 @@ public class PokeDataDisplay : MonoBehaviour
                 GameObject child = moveHolder.GetChild(i).gameObject;
 
                 //Ignore the labels
-                if(child.tag == LabelTag) continue;
+                if (child.tag == LabelTag) continue;
 
                 GameObject.Destroy(child);
                 Debug.Log("Removed previous move panels");
