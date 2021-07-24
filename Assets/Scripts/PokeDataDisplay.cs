@@ -16,12 +16,14 @@ public class PokeDataDisplay : MonoBehaviour
     [SerializeField] TMP_Text pokemonWeightText;
     [SerializeField] TMP_Text pokedexInfo;
 
+    [SerializeField] VerticalLayoutGroup mainLayoutGroup;
+    [SerializeField] RectTransform mainHolder;
     [SerializeField] RectTransform moveHolder;
     [SerializeField] RectTransform abilityHolder;
     [SerializeField] GameObject imageSwitchButtonHolder;
 
     [SerializeField, Space] GameObject moveTemplate;
-    [SerializeField, Space] GameObject abilityTemplate;
+    [SerializeField] GameObject abilityTemplate;
 
     private PokemonData fetchedData;
     private bool isFrontSpriteDisplayed = true;
@@ -148,6 +150,13 @@ public class PokeDataDisplay : MonoBehaviour
                 abilityIns.GetComponent<Ability>().InitializeAbility(ability);
             }
         }
+    }
+
+    IEnumerator<YieldInstruction> Waiter()
+    {
+        mainLayoutGroup.enabled = false;
+        yield return new WaitForEndOfFrame();
+        mainLayoutGroup.enabled = true;
     }
 
     [ContextMenu("Switch Sprite")]
